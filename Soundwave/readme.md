@@ -17,4 +17,4 @@ FARSASYNTH is an interactive, browser-based Digital Audio Workstation (DAW) that
 Since FARSASYNTH is a pure frontend application without complex build tools:
 1. Clone this repository.
 2. Open `Index.html` directly in any modern browser (Google Chrome or Microsoft Edge recommended for Web Audio API support).
-3. Allow Microphone and Camera permissions when prompted to fully experience the Gesture Jam and Audio Lab modules.
+3. Allow Microphone and Camera permissions when prompted to fully experience the Gesture Jam and Audio Lab modules...

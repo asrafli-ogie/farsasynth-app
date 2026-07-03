@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARSASYNTH - Virtual Audio Workstation</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>FARSASYNTH<span>.ai</span></h1>
+            <p>Web-Based Audio AI Workstation</p>
+        </div>
+        <div class="status-area">
+            <div class="status-dot"></div>
+            System Ready
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>The Future of Music, Right in Your Hands.</h2>
+        <p>Mainkan instrumen musik akustik dan digital murni menggunakan kecerdasan buatan pelacak gestur tangan, langsung di browser Anda.</p>
+    </div>
+
+    <div class="grid-container" id="mainMenu">
+        <div class="card">
+            <div class="card-icon">🎸</div>
+            <h3>Gesture Jam</h3>
+            <p>Bermain bebas dengan sensor kamera. Gunakan gestur jari untuk memicu chord Piano, Gitar, atau Synth favoritmu.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🎹</div>
+            <h3>VPiano</h3>
+            <p>Latih memori otot tanganmu. Tebak tantangan chord di layar secara real-time dan kumpulkan skor tertinggi.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🎛️</div>
+            <h3>Audio Lab</h3>
+            <p>Eksperimen dengan efek studio virtual. Atur Reverb, Delay, dan Distortion untuk menciptakan karakter suaramu sendiri.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🕹️</div>
+            <h3>Groovebox</h3>
+            <p>Pabrik beat pribadimu. Rangkai ketukan drum dan melodi synth dalam grid sequencer 8-step secara real-time.</p>
+        </div>
+    </div>
+
+    <div id="workspace" style="display: none; text-align: center; padding: 20px; margin-bottom: 100px;">
+        <h2 style="color: var(--neon-purple); margin-bottom: 20px;">Live Camera Tracker</h2>
+
+        <div id="instrumentSelector" style="margin-bottom: 25px; display: flex; justify-content: center; gap: 15px;">
+            <button class="inst-btn" data-inst="piano" style="background: var(--neon-purple); border: 1px solid var(--neon-purple); padding: 8px 20px; border-radius: 20px; color: white; cursor: pointer; font-weight: bold; transition: 0.3s;">🎹 Piano</button>
+            <button class="inst-btn" data-inst="guitar" style="background: transparent; border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; color: white; cursor: pointer; font-weight: bold; transition: 0.3s;">🎸 Guitar</button>
+            <button class="inst-btn" data-inst="synth" style="background: transparent; border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; color: white; cursor: pointer; font-weight: bold; transition: 0.3s;">🎛️ Synth (Sustain)</button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+            <div style="position: relative;">
+                <video id="videoElement" autoplay playsinline style="display:none;"></video>
+                <canvas id="canvasElement" width="640" height="480" style="border: 2px solid var(--neon-green); border-radius: 12px; transform: scaleX(-1); background: #000; box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); max-width: 100%;"></canvas>
+                
+                <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(9,9,11,0.9); padding: 10px 30px; border-radius: 30px; border: 1px solid var(--neon-purple); font-size: 24px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    Chord: <span id="uiChordName" style="color: var(--neon-green);">-</span>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: left; min-width: 250px;">
+                <h3 style="margin-top: 0; color: var(--neon-purple); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">📖 Petunjuk Gestur</h3>
+                <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8; font-size: 14px;">
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">C</b> = 1 Jari (Telunjuk)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">D</b> = 2 Jari (Telunjuk + Tengah)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">E</b> = 3 Jari (Tel, Teng, Manis)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">F</b> = 4 Jari (Tanpa Jempol)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">G</b> = 5 Jari (Terbuka Semua)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">A</b> = Jempol + Kelingking (Surfer)</li>
+                    <li><b style="color:#fbbf24; display:inline-block; width:25px;">B</b> = Jempol Saja (Thumbs Up)</li>
+                </ul>
+                <div style="margin-top: 15px; padding: 10px; background: #27272a; border-radius: 8px; font-size: 13px;">
+                    <b>Major</b> = Tangan Tegak Lurus<br>
+                    <b>Minor</b> = Tangan Miring / Rebahan
+                </div>
+            </div>
+        </div>
+        
+        <br>
+        <button id="btnBack" class="btn-play" style="margin-top: 25px; padding: 12px 25px; background-color: #ef4444; border-color: #ef4444;">⬅ Matikan Kamera & Kembali</button>
+    </div>
+
+    <div id="pianoWorkspace" style="display: none; text-align: center; padding: 20px; margin-bottom: 100px;">
+        <h2 style="color: var(--neon-purple); margin-bottom: 20px;">🎹 Virtual Piano</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Klik tuts pakai mouse atau gunakan keyboard laptop (A, W, S, E, D, F...)</p>
+        
+        <div class="piano-container">
+            <div class="piano-key white-key" data-note="C4" data-key="a">A<br><span>C</span></div>
+            <div class="piano-key black-key" data-note="C#4" data-key="w">W</div>
+            <div class="piano-key white-key" data-note="D4" data-key="s">S<br><span>D</span></div>
+            <div class="piano-key black-key" data-note="D#4" data-key="e">E</div>
+            <div class="piano-key white-key" data-note="E4" data-key="d">D<br><span>E</span></div>
+            <div class="piano-key white-key" data-note="F4" data-key="f">F<br><span>F</span></div>
+            <div class="piano-key black-key" data-note="F#4" data-key="t">T</div>
+            <div class="piano-key white-key" data-note="G4" data-key="g">G<br><span>G</span></div>
+            <div class="piano-key black-key" data-note="G#4" data-key="y">Y</div>
+            <div class="piano-key white-key" data-note="A4" data-key="h">H<br><span>A</span></div>
+            <div class="piano-key black-key" data-note="A#4" data-key="u">U</div>
+            <div class="piano-key white-key" data-note="B4" data-key="j">J<br><span>B</span></div>
+            <div class="piano-key white-key" data-note="C5" data-key="k">K<br><span>C5</span></div>
+        </div>
+
+        <br>
+        <button id="btnBackPiano" class="btn-play" style="margin-top: 40px; padding: 12px 25px; background-color: #ef4444; border-color: #ef4444;">⬅ Kembali ke Menu Utama</button>
+    </div>
+
+    <div id="audioLabWorkspace" style="display: none; text-align: center; padding: 20px; margin-bottom: 100px;">
+        <h2 style="color: var(--neon-purple); margin-bottom: 10px;">🎛️ Audio Lab: Live Studio</h2>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Tes vokal pakai Live Mic, atau putar Test Loop untuk meracik efek Reverb & Delay.</p>
+        
+        <canvas id="visualizerCanvas" width="600" height="120" style="background: #09090b; border: 1px solid var(--neon-purple); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); max-width: 100%;"></canvas>
+
+        <div style="margin-bottom: 30px; display: flex; justify-content: center; gap: 15px;">
+            <button id="btnMic" class="btn-play" style="padding: 10px 20px; background: transparent;">🎤 Live Mic : OFF</button>
+            <button id="btnLoop" class="btn-play" style="padding: 10px 20px; background: transparent;">🎵 Test Loop : OFF</button>
+        </div>
+
+        <div class="effects-rack" style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 500px; margin: 0 auto; text-align: left;">
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <label style="color: var(--text-main); font-weight: bold; font-size: 14px;">Reverb (Gema Ruangan)</label>
+                    <span id="revValue" style="color: var(--neon-green); font-size: 12px;">0%</span>
+                </div>
+                <input type="range" id="revSlider" min="0" max="1" step="0.05" value="0" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <label style="color: var(--text-main); font-weight: bold; font-size: 14px;">Delay (Echo Pantulan)</label>
+                    <span id="delValue" style="color: var(--neon-green); font-size: 12px;">0%</span>
+                </div>
+                <input type="range" id="delSlider" min="0" max="1" step="0.05" value="0" style="width: 100%;">
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <label style="color: var(--text-main); font-weight: bold; font-size: 14px;">Distortion (Pecah/Kotor)</label>
+                    <span id="distValue" style="color: var(--neon-green); font-size: 12px;">0%</span>
+                </div>
+                <input type="range" id="distSlider" min="0" max="1" step="0.05" value="0" style="width: 100%;">
+            </div>
+        </div>
+
+        <br>
+        <button id="btnBackLab" class="btn-play" style="margin-top: 30px; padding: 12px 25px; background-color: #ef4444; border-color: #ef4444;">⬅ Matikan Mic & Kembali</button>
+    </div>
+
+    <div id="grooveboxWorkspace" style="display: none; text-align: center; padding: 20px; margin-bottom: 100px;">
+        <h2 style="color: var(--neon-purple); margin-bottom: 10px;">🕹️ Groovebox: Step Sequencer</h2>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Nyalakan kotak-kotak di bawah untuk merangkai irama. Tekan tombol Play untuk mulai looping.</p>
+        
+        <div style="margin-bottom: 20px;">
+            <button id="btnPlayGroove" class="btn-play" style="background: var(--neon-green); color: #000; border-color: var(--neon-green);">▶ Play Sequence</button>
+            <button id="btnClearGroove" class="btn-play" style="background: transparent; margin-left: 10px;">🗑️ Clear All</button>
+        </div>
+
+        <div class="sequencer-grid" style="display: grid; gap: 10px; max-width: 600px; margin: 0 auto; background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: white; width: 60px; text-align: left; font-size: 14px; font-weight: bold;">Hi-Hat</span>
+                <div class="track" data-inst="hihat" style="display: flex; gap: 8px;">
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: white; width: 60px; text-align: left; font-size: 14px; font-weight: bold;">Snare</span>
+                <div class="track" data-inst="snare" style="display: flex; gap: 8px;">
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: white; width: 60px; text-align: left; font-size: 14px; font-weight: bold;">Kick</span>
+                <div class="track" data-inst="kick" style="display: flex; gap: 8px;">
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: var(--neon-purple); width: 60px; text-align: left; font-size: 14px; font-weight: bold;">Synth</span>
+                <div class="track" data-inst="synth" style="display: flex; gap: 8px;">
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                    <div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div><div class="step-btn"></div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <button id="btnBackGroove" class="btn-play" style="margin-top: 30px; padding: 12px 25px; background-color: #ef4444; border-color: #ef4444;">⬅ Kembali ke Menu Utama</button>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="control-group">
+            <span class="control-label">Master Volume</span>
+            <input type="range" id="masterVolume" min="0" max="100" value="80">
+        </div>
+        <div class="control-group">
+            <span class="control-label">Metronome</span>
+            <input type="range" id="bpmSlider" min="60" max="180" value="120">
+            <span id="bpmLabel" style="color: var(--neon-green); font-size: 14px; font-weight: bold;">120 BPM</span>
+            <button id="btnMetro" class="btn-play">▶ Play</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

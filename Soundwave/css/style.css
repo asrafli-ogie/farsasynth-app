@@ -1,0 +1,144 @@
+/* File: css/style.css */
+:root {
+    --bg-dark: #09090b;
+    --bg-card: #18181b;
+    --border-color: #27272a;
+    --text-main: #f4f4f5;
+    --text-muted: #a1a1aa;
+    --neon-purple: #a855f7;
+    --neon-green: #34d399;
+}
+
+body {
+    margin: 0; padding: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; flex-direction: column; min-height: 100vh;
+}
+
+header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 40px; border-bottom: 1px solid var(--border-color);
+    background-color: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 100;
+}
+.logo-area h1 { margin: 0; font-size: 24px; color: var(--text-main); letter-spacing: 1px; }
+.logo-area span { color: var(--neon-purple); }
+.logo-area p { margin: 0; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+.status-area { font-size: 13px; color: var(--neon-green); display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; background-color: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green); }
+
+.hero { text-align: center; padding: 60px 20px 40px; }
+.hero h2 { font-size: 42px; margin: 0 0 15px 0; background: linear-gradient(to right, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; max-width: 900px; margin: 0 auto 100px; padding: 0 20px; }
+.card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+.card:hover { transform: translateY(-5px); border-color: var(--neon-purple); box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15); }
+.card-icon { font-size: 40px; margin-bottom: 15px; }
+.card h3 { margin: 0 0 10px 0; font-size: 20px; color: var(--text-main); }
+.card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: transparent; transition: background 0.3s ease; }
+.card:hover::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-green)); }
+
+.bottom-bar {
+    margin-top: auto; background-color: #111113; border-top: 1px solid var(--border-color);
+    padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+    position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 200;
+}
+.control-group { display: flex; align-items: center; gap: 15px; }
+.control-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+input[type=range] { accent-color: var(--neon-purple); cursor: pointer; }
+.btn-play { background-color: var(--border-color); color: var(--text-main); border: 1px solid #3f3f46; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.btn-play:hover { background-color: var(--neon-purple); border-color: var(--neon-purple); }
+
+/* --- PIANO UI --- */
+.piano-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    margin: 0 auto;
+    background: #111;
+    padding: 15px;
+    border-radius: 12px;
+    width: fit-content;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 2px solid var(--border-color);
+}
+.piano-key {
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    user-select: none; /* Biar teks gak ke-block pas diklik cepet */
+    transition: background 0.1s, transform 0.1s;
+}
+.white-key {
+    width: 60px;
+    height: 220px;
+    background: #f4f4f5;
+    color: #18181b;
+    border: 1px solid #ccc;
+    border-radius: 0 0 6px 6px;
+    z-index: 1;
+}
+.white-key span {
+    font-size: 11px;
+    color: #71717a;
+    margin-top: 5px;
+}
+.black-key {
+    width: 40px;
+    height: 130px;
+    background: #18181b;
+    color: #f4f4f5;
+    /* Ini trik CSS buat numpuk tuts hitam di antara tuts putih */
+    margin-left: -20px; 
+    margin-right: -20px;
+    z-index: 2;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid #000;
+    box-shadow: inset 0 -5px 10px rgba(255,255,255,0.1);
+}
+/* Efek saat tuts ditekan (Active) */
+.white-key:active, .white-key.active {
+    background: #d4d4d8;
+    transform: translateY(2px);
+}
+.black-key:active, .black-key.active {
+    background: var(--neon-purple);
+    color: white;
+    transform: translateY(2px);
+}
+
+/* ==========================================
+   --- GROOVEBOX UI (MINI DAW) ---
+   ========================================== */
+.step-btn {
+    width: 40px;
+    height: 40px;
+    background: #27272a;
+    border: 2px solid #3f3f46;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.step-btn:hover {
+    background: #3f3f46;
+}
+/* Warna pas kotaknya dinyalain (Nyala Ungu) */
+.step-btn.active {
+    background: var(--neon-purple);
+    border-color: #d8b4fe;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+/* Warna indikator pas dilewatin garis waktu (Nyala Hijau) */
+.step-btn.playing {
+    border-color: var(--neon-green);
+    transform: scale(1.1);
+}
